@@ -11,6 +11,8 @@
  */
 
 
+#include "Utils.h"
+
 #include <algorithm>
 #include <deque>
 #include <fstream>
@@ -19,161 +21,192 @@
 #include <string>
 #include <unordered_set>
 
-class Course
+namespace abcu
 {
-public:
-    // Course Name and id
-    std::string name, courseId;
-    // Set of all the pre-requisites
-    // Set is used here to ensure O(1) access and deletion when removing invalid prerequisites
-    std::unordered_set<std::string> prerequisites;
 
-    /**
-     * @brief Parse a `std::string` to a course object.
-     * @param line The line to parse.
-     * @return The @ref Course object.
-     *
-     * @throws `std::invalid_argument` if the string parsing fail with invalid course name or course id.
-     */
-    static Course parseCourse(const std::string& line)
+    class Course
     {
-        std::stringstream ss(line);
-        std::string currentToken;
-        int iteration = 0;
+    public:
+        // Course Name and id
+        std::string name, courseId;
+        // Set of all the pre-requisites
+        // Set is used here to ensure O(1) access and deletion when removing invalid prerequisites
+        std::unordered_set<std::string> prerequisites;
+
+        /**
+         * @brief Parse a `std::string` to a course object.
+         * @param line The line to parse.
+         * @return The @ref Course object.
+         *
+         * @throws `std::invalid_argument` if the string parsing fail with invalid course name or course id.
+         */
+        static Course parseCourse(const std::string& line)
+        {
+            std::stringstream ss(line);
+            std::string currentToken;
+            int iteration = 0;
+            Course course;
+            while (std::getline(ss, currentToken, ','))
+            {
+                if (iteration == 0)
+                {
+                    // Course ID
+                    // If the course name is empty, then it is not a valid course
+                    if (currentToken.length() < 1)
+                        throw std::invalid_argument("[Invalid Course]: Empty Course ID");
+
+                    course.courseId = currentToken;
+                }
+                else if (iteration == 1)
+                {
+                    // Course name
+                    // If the course name is empty, then it is not a valid course
+                    if (currentToken.length() < 1)
+                        throw std::invalid_argument("[Invalid Course]: Empty Course Name");
+                    course.name = currentToken;
+                }
+                else
+                {
+                    // Prerequisites
+                    if (currentToken.length() > 1)
+                        course.prerequisites.insert(currentToken);
+                }
+                // Increment the iteration count to move forward
+                ++iteration;
+            }
+
+            return course;
+        }
+
+
+        /**
+         * @brief Stream @p course to the output stream for printing.
+         *
+         * @param stream The ostream to stream the object to.
+         * @param course The object to stream.
+         *
+         * @return A reference to @p stream that has the object.
+         */
+        friend std::ostream& operator<<(std::ostream& stream, const Course& course)
+        {
+            stream << course.name << " (" << course.courseId << ")\n";
+            stream << "Prerequisites: ";
+
+            // Print all the prerequisites in a comma separated form.
+            int prerequisiteCount = 0;
+            for (const auto& prerequisite : course.prerequisites)
+            {
+                stream << prerequisite;
+                // Only output the delimiter if the current prerequisite is not the last pre-requisite
+                if (++prerequisiteCount < course.prerequisites.size())
+                    stream << ", ";
+            }
+
+            // If there are no pre-requisites, let the user know
+            if (prerequisiteCount == 0)
+                stream << "None";
+
+            stream << "\n\n";
+            return stream;
+        }
+    };
+
+    class CourseNode
+    {
+    public:
         Course course;
-        while (std::getline(ss, currentToken, ','))
-        {
-            if (iteration == 0)
-            {
-                // Course ID
-                // If the course name is empty, then it is not a valid course
-                if (currentToken.length() < 1)
-                    throw std::invalid_argument("[Invalid Course]: Empty Course ID");
 
-                course.courseId = currentToken;
-            }
-            else if (iteration == 1)
-            {
-                // Course name
-                // If the course name is empty, then it is not a valid course
-                if (currentToken.length() < 1)
-                    throw std::invalid_argument("[Invalid Course]: Empty Course Name");
-                course.name = currentToken;
-            }
-            else
-            {
-                // Prerequisites
-                if (currentToken.length() > 1)
-                    course.prerequisites.insert(currentToken);
-            }
-            // Increment the iteration count to move forward
-            ++iteration;
-        }
+        // Initialize left and right with nullptr
+        CourseNode* left{ nullptr };
+        CourseNode* right{ nullptr };
+    };
 
-        return course;
-    }
-
-
-    /**
-     * @brief Stream @p course to the output stream for printing.
-     *
-     * @param stream The ostream to stream the object to.
-     * @param course The object to stream.
-     *
-     * @return A reference to @p stream that has the object.
-     */
-    friend std::ostream& operator<<(std::ostream& stream, const Course& course)
+    class CourseManager
     {
-        stream << course.name << " (" << course.courseId << ")\n";
-        stream << "Prerequisites: ";
+        // Initialize root with nullptr
+        CourseNode* root{ nullptr };
 
-        // Print all the prerequisites in a comma separated form.
-        int prerequisiteCount = 0;
-        for (const auto& prerequisite : course.prerequisites)
+    public:
+        /**
+         * @brief Load a CSV file containing courses into a container.
+         */
+        void loadCourses(const std::string& filename)
         {
-            stream << prerequisite;
-            // Only output the delimiter if the current prerequisite is not the last pre-requisite
-            if (++prerequisiteCount < course.prerequisites.size())
-                stream << ", ";
-        }
+            std::cout << "Loading CSV file..." << '\n';
 
-        // If there are no pre-requisites, let the user know
-        if (prerequisiteCount == 0)
-            stream << "None";
+            // Cache to add the existing courses so we can filter out any non-existant courses from pre-requisites
+            std::unordered_set<std::string> existingCourses;
 
-        stream << "\n\n";
-        return stream;
-    }
-};
+            // Set the iostream to trigger an exception
+            std::cin.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
-class CourseNode
-{
-public:
-    Course course;
-
-    // Initialize left and right with nullptr
-    CourseNode* left{ nullptr };
-    CourseNode* right{ nullptr };
-};
-
-class CourseManager
-{
-    // Initialize root with nullptr
-    CourseNode* root{ nullptr };
-
-public:
-    /**
-     * @brief Load a CSV file containing courses into a container.
-     */
-    void loadCourses(const std::string& filename)
-    {
-        std::cout << "Loading CSV file..." << '\n';
-
-        // Cache to add the existing courses so we can filter out any non-existant courses from pre-requisites
-        std::unordered_set<std::string> existingCourses;
-
-        // Set the iostream to trigger an exception
-        std::cin.exceptions(std::ios_base::failbit | std::ios_base::badbit);
-
-        try
-        {
-            std::ifstream csvFile(filename);
-
-            std::string line;
-            while (std::getline(csvFile, line))
+            try
             {
-                try
+                std::ifstream csvFile(filename);
+
+                std::string line;
+                while (std::getline(csvFile, line))
                 {
-                    auto course = Course::parseCourse(line);
-                    // Add the CourseId to the cache
-                    existingCourses.insert(course.courseId);
-                    insertCourse(course);
-                }
-                catch (const std::exception& e)
-                {
-                    std::cout << e.what() << '\n';
-                    // Clear the fail bit status
-                    std::cin.clear();
-                    // Clear the cin buffer
-                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    try
+                    {
+                        auto course = Course::parseCourse(line);
+                        // Add the CourseId to the cache
+                        existingCourses.insert(course.courseId);
+                        insertCourse(course);
+                    }
+                    catch (const std::exception& e)
+                    {
+                        std::cout << e.what() << '\n';
+                        // Clear the fail bit status
+                        std::cin.clear();
+                        // Clear the cin buffer
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    }
                 }
             }
+            catch (const std::exception& e)
+            {
+                std::cout << e.what() << '\n';
+            }
+            // Turn off exceptions
+            std::cin.exceptions(std::ios_base::goodbit);
+
+            //TODO: Validation [Removing invalid prerequisites]
+            //TODO: StrCmp
         }
-        catch (const std::exception& e)
+
+
+
+        void printCourse(const std::string& courseId) const
         {
-            std::cout << e.what() << '\n';
+            if (root == nullptr)
+                std::cout << "Empty course list. Consider loading the courses first.\n";
+
+            auto current = root;
+            // Print the current course if it's ID matches the provided course id
+
+            while (current != nullptr)
+            {
+                // If the current course's id and passed-in course id are equal
+                // Then print the course information
+                if (utils::strCmp(current->course.courseId, courseId))
+                {
+                    std::cout << current->course;
+                    return;
+                }
+
+                // Else if the search course id lower, search the left subtree
+                if (courseId < current->course.courseId)
+                    current = current->left;
+                // else search the right subtree
+                else
+                    current = current->right;
+            }
+
+            // If the function doesn't early exit
+            // Then, there are no course with the given id
+            std::cout << "No course with " << courseId << " found!\n";
         }
-        std::cout << "Printing Courses...\n\n";
-        // Turn off exceptions
-        std::cin.exceptions(std::ios_base::goodbit);
-    }
-
-
-
-    void printCourse(const std::string& courseId)
-    {
-
-    }
 
         // TODO: remove invalid prerequisites
         //  TODO: find course
@@ -185,74 +218,76 @@ public:
          * @param course The course to insert.
          */
         void insertCourse(const Course& course)
-    {
-        auto node = new CourseNode;
-        node->course = course;
-
-        if (root == nullptr)
-            root = node;
-        else
         {
-            auto current = root;
-            while (true)
+            auto node = new CourseNode;
+            node->course = course;
+
+            if (root == nullptr)
+                root = node;
+            else
             {
-                // If the course to insert has name with lower lexicographical index
-                // then move to the left branch
-                if (course.courseId < current->course.courseId)
+                auto current = root;
+                while (true)
                 {
-                    if (current->left == nullptr)
+                    // If the course to insert has name with lower lexicographical index
+                    // then move to the left branch
+                    if (course.courseId < current->course.courseId)
                     {
-                        // Insert the node at left that slot is empty
-                        current->left = node;
-                        return; // Return to exit the loop since the node is inserted
+                        if (current->left == nullptr)
+                        {
+                            // Insert the node at left that slot is empty
+                            current->left = node;
+                            return; // Return to exit the loop since the node is inserted
+                        }
+                        // Move forward
+                        current = current->left;
                     }
-                    // Move forward
-                    current = current->left;
-                }
-                // Else move to the right branch
-                else
-                {
-                    if (current->right == nullptr)
+                    // Else move to the right branch
+                    else
                     {
-                        // Insert the node at left that slot is empty
-                        current->right = node;
-                        return; // Return to exit the loop since the node is inserted
+                        if (current->right == nullptr)
+                        {
+                            // Insert the node at left that slot is empty
+                            current->right = node;
+                            return; // Return to exit the loop since the node is inserted
+                        }
+                        // Move forward
+                        current = current->right;
                     }
-                    // Move forward
-                    current = current->right;
                 }
             }
         }
-    }
 
-    /**
-     * @brief Traverse and print the courses in an in-order format.
-     * @param node The current root.
-     */
-    static void printInOrder(const CourseNode* node)
-    {
-        if (node == nullptr)
-            return;
-
-        printInOrder(node->left);
-        std::cout << node->course;
-        printInOrder(node->right);
-    }
-
-
-    /**
-     * @brief Print the course in alphabetical sorting.
-     */
-    void printCourses()
-    {
-        // Edge case: There are no courses
-        if (root == nullptr)
+        /**
+         * @brief Traverse and print the courses in an in-order format.
+         * @param node The current root.
+         */
+        static void printInOrder(const CourseNode* node)
         {
-            std::cout << "No courses!";
-            return;
+            if (node == nullptr)
+                return;
+
+            printInOrder(node->left);
+            std::cout << node->course;
+            printInOrder(node->right);
         }
 
-        // Helper function that recursively prints the courses
-        printInOrder(root);
-    }
-};
+
+        /**
+         * @brief Print the course in alphabetical sorting.
+         */
+        void printCourses()
+        {
+            // Edge case: There are no courses
+            if (root == nullptr)
+            {
+                std::cout << "No courses!";
+                return;
+            }
+
+            // Helper function that recursively prints the courses
+            printInOrder(root);
+        }
+    };
+
+} // namespace abcu

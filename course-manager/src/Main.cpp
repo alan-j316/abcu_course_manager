@@ -40,6 +40,8 @@ public:
      */
     void dispatchAction(const int actionCode)
     {
+
+        std::string searchCourseId;
         switch (actionCode)
         {
             case 1:
@@ -49,7 +51,8 @@ public:
                 _manager.printCourses();
                 break;
             case 3:
-                std::cout << "Searching courses...";
+                std::cin >> searchCourseId;
+                _manager.printCourse(searchCourseId);
                 break;
             case 9:
                 std::cout << "Exiting application...\n";
@@ -109,7 +112,7 @@ public:
 private:
     bool _running;
     std::string _filename;
-    CourseManager _manager;
+    abcu::CourseManager _manager;
 };
 
 int main(int argc, char* argv[])
