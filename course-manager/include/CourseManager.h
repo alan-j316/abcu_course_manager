@@ -11,6 +11,7 @@
  */
 
 
+#include <algorithm>
 #include <deque>
 #include <fstream>
 #include <iostream>
@@ -167,16 +168,36 @@ public:
         std::cin.exceptions(std::ios_base::goodbit);
     }
 
-    //TODO: remove invalid prerequisites
-    // TODO: find course
-    // TODO: Destructor
-
-
     /**
-     * @brief Insert @ref course into the course manager.
-     * @param course The course to insert.
+     * @brief Compare if any of the two strings starts with a substring of the other.
+     * @param a The first string to compare.
+     * @param b The second string to compare.
+     * @return True if either of the strings starts with the other.
      */
-    void insertCourse(const Course& course)
+    static bool strStartsWith(const std::string& a, const std::string& b)
+    {
+        const auto minCharCount = std::min(a.length(), b.length());
+        for (std::size_t i = 0; i < minCharCount; ++i)
+            if (std::tolower(a[i]) != std::tolower(b[i]))
+                return false;
+        return true;
+    }
+
+    void printCourse(const std::string& courseId)
+    {
+
+    }
+
+        // TODO: remove invalid prerequisites
+        //  TODO: find course
+        //  TODO: Destructor
+
+
+        /**
+         * @brief Insert @ref course into the course manager.
+         * @param course The course to insert.
+         */
+        void insertCourse(const Course& course)
     {
         auto node = new CourseNode;
         node->course = course;
@@ -190,7 +211,7 @@ public:
             {
                 // If the course to insert has name with lower lexicographical index
                 // then move to the left branch
-                if (course.name < current->course.name)
+                if (course.courseId < current->course.courseId)
                 {
                     if (current->left == nullptr)
                     {
