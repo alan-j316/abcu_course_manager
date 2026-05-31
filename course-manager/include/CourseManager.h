@@ -168,20 +168,7 @@ public:
         std::cin.exceptions(std::ios_base::goodbit);
     }
 
-    /**
-     * @brief Compare if any of the two strings starts with a substring of the other.
-     * @param a The first string to compare.
-     * @param b The second string to compare.
-     * @return True if either of the strings starts with the other.
-     */
-    static bool strStartsWith(const std::string& a, const std::string& b)
-    {
-        const auto minCharCount = std::min(a.length(), b.length());
-        for (std::size_t i = 0; i < minCharCount; ++i)
-            if (std::tolower(a[i]) != std::tolower(b[i]))
-                return false;
-        return true;
-    }
+
 
     void printCourse(const std::string& courseId)
     {
