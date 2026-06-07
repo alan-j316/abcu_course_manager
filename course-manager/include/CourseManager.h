@@ -126,6 +126,33 @@ namespace abcu
         // Initialize root with nullptr
         CourseNode* root{ nullptr };
 
+        /**
+         * @brief Remove invalid pre-requisites from the courses.
+         *        A prerequisite is considered invalid, if that course id is not present in @p cache.
+         *
+         * @note To speed up look, the method uses the supplied cache for valid course look,
+         *       so providing an empty cache will return the courses without validation.
+         *
+         * @param root  The root of the course manager.
+         * @param cache The cache to use for validation.
+         */
+void removeInvalidPrerequisites(CourseNode* root, const std::unordered_set<std::string>& cache)
+{
+    if (cache.size() < 1)
+        return; // No invalidation is performed if the cache is empty
+
+    // Base case
+    if (root == nullptr) return; // Base case
+
+    // Remove invalid course pre-requisite from the subtrees
+    removeInvalidPrerequisites(root->left, cache);
+    removeInvalidPrerequisites(root->right, cache);
+
+    for (auto& prerequisite: root->course.prerequisites)
+        if (cache.count(prerequisite) == 0)
+            root->course.prerequisites.erase(prerequisite);
+}
+
     public:
         /**
          * @brief Load a CSV file containing courses into a container.
@@ -171,7 +198,7 @@ namespace abcu
             // Turn off exceptions
             std::cin.exceptions(std::ios_base::goodbit);
 
-            // TODO: Validation [Removing invalid prerequisites]
+            removeInvalidPrerequisites(root, existingCourses);
         }
 
 
