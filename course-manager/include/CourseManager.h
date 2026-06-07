@@ -133,207 +133,50 @@ namespace abcu
          * @note To speed up look, the method uses the supplied cache for valid course look,
          *       so providing an empty cache will return the courses without validation.
          *
-         * @param root  The root of the course manager.
+         * @param node  The root of the course manager.
          * @param cache The cache to use for validation.
          */
-void removeInvalidPrerequisites(CourseNode* root, const std::unordered_set<std::string>& cache)
-{
-    if (cache.size() < 1)
-        return; // No invalidation is performed if the cache is empty
-
-    // Base case
-    if (root == nullptr) return; // Base case
-
-    // Remove invalid course pre-requisite from the subtrees
-    removeInvalidPrerequisites(root->left, cache);
-    removeInvalidPrerequisites(root->right, cache);
-
-    for (auto& prerequisite: root->course.prerequisites)
-        if (cache.count(prerequisite) == 0)
-            root->course.prerequisites.erase(prerequisite);
-}
-
-    public:
-        /**
-         * @brief Load a CSV file containing courses into a container.
-         */
-        void loadCourses(const std::string& filename)
-        {
-            std::cout << "Loading CSV file..." << '\n';
-
-            // Cache to add the existing courses so we can filter out any non-existant courses from pre-requisites
-            std::unordered_set<std::string> existingCourses;
-
-            // Set the iostream to trigger an exception
-            std::cin.exceptions(std::ios_base::failbit | std::ios_base::badbit);
-
-            try
-            {
-                std::ifstream csvFile(filename);
-
-                std::string line;
-                while (std::getline(csvFile, line))
-                {
-                    try
-                    {
-                        auto course = Course::parseCourse(line);
-                        // Add the CourseId to the cache
-                        existingCourses.insert(course.courseId);
-                        insertCourse(course);
-                    }
-                    catch (const std::exception& e)
-                    {
-                        std::cout << e.what() << '\n';
-                        // Clear the fail bit status
-                        std::cin.clear();
-                        // Clear the cin buffer
-                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                    }
-                }
-            }
-            catch (const std::exception& e)
-            {
-                std::cout << e.what() << '\n';
-            }
-            // Turn off exceptions
-            std::cin.exceptions(std::ios_base::goodbit);
-
-            removeInvalidPrerequisites(root, existingCourses);
-        }
-
-
-
-        void printCourse(const std::string& courseId) const
-        {
-            if (root == nullptr)
-                std::cout << "Empty course list. Consider loading the courses first.\n";
-
-            auto current = root;
-            // Print the current course if it's ID matches the provided course id
-
-            while (current != nullptr)
-            {
-                // If the current course's id and passed-in course id are equal
-                // Then print the course information
-                if (utils::strCmp(current->course.courseId, courseId) == 0)
-                {
-                    std::cout << current->course;
-                    return;
-                }
-
-                // Else if the search course id lower, search the left subtree
-                if (utils::strCmp(courseId, current->course.courseId) < 0)
-                    current = current->left;
-                // else search the right subtree
-                else
-                    current = current->right;
-            }
-
-            // If the function doesn't early exit
-            // Then, there are no course with the given id
-            std::cout << "No course with " << courseId << " found!\n";
-        }
-
-        // TODO: remove invalid prerequisites
-
-
-        /**
-         * @brief Insert @ref course into the course manager.
-         * @param course The course to insert.
-         */
-        void insertCourse(const Course& course)
-        {
-            auto node = new CourseNode;
-            node->course = course;
-
-            if (root == nullptr)
-                root = node;
-            else
-            {
-                auto current = root;
-                while (true)
-                {
-                    // If the course to insert has name with lower lexicographical index
-                    // then move to the left branch
-                    if (course.courseId < current->course.courseId)
-                    {
-                        if (current->left == nullptr)
-                        {
-                            // Insert the node at left that slot is empty
-                            current->left = node;
-                            return; // Return to exit the loop since the node is inserted
-                        }
-                        // Move forward
-                        current = current->left;
-                    }
-                    // Else move to the right branch
-                    else
-                    {
-                        if (current->right == nullptr)
-                        {
-                            // Insert the node at left that slot is empty
-                            current->right = node;
-                            return; // Return to exit the loop since the node is inserted
-                        }
-                        // Move forward
-                        current = current->right;
-                    }
-                }
-            }
-        }
+        static void removeInvalidPrerequisites(CourseNode* node, const std::unordered_set<std::string>& cache);
 
         /**
          * @brief Traverse and print the courses in an in-order format.
          * @param node The current root.
          */
-        static void printInOrder(const CourseNode* node)
-        {
-            if (node == nullptr)
-                return;
-
-            printInOrder(node->left);
-            std::cout << node->course;
-            printInOrder(node->right);
-        }
-
-
-        /**
-         * @brief Print the course in alphabetical sorting.
-         */
-        void printCourses() const
-        {
-            // Edge case: There are no courses
-            if (root == nullptr)
-            {
-                std::cout << "No courses!";
-                return;
-            }
-
-            // Helper function that recursively prints the courses
-            printInOrder(root);
-        }
-
+        static void printInOrder(const CourseNode* node);
 
         /**
          * @brief Delete the current course from memory, after freeing its children.
          * @param node
          */
-        void removeAllCourse(CourseNode* node)
-        {
-            // Base case
-            if (node == nullptr)
-                return;
-            // Recursively delete left and right subchildren
-            removeAllCourse(node->left);
-            removeAllCourse(node->right);
-            // Afterward delete the node
-            delete node;
-        }
+        static void removeAllCourse(CourseNode* node);
 
-        ~CourseManager()
-        {
-            removeAllCourse(root);
-        }
+    public:
+        /**
+         * @brief Class destructor.
+         */
+        ~CourseManager();
+
+        /**
+         * @brief Load a CSV file containing courses into a container.
+         */
+        void loadCourses(const std::string& filename);
+
+        /**
+         * @brief Search for a course with an id of @p courseId, and print it's details.
+         * @param courseId The courseId to match.
+         */
+        void printCourse(const std::string& courseId) const;
+
+        /**
+         * @brief Insert @ref course into the course manager.
+         * @param course The course to insert.
+         */
+        void insertCourse(const Course& course);
+
+        /**
+         * @brief Print the courses in alphabetical sorting.
+         */
+        void printCourses() const;
     };
 
 } // namespace abcu
