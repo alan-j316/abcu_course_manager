@@ -11,117 +11,13 @@
  */
 
 
-#include "Utils.h"
-
-#include <algorithm>
-#include <deque>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <string>
 #include <unordered_set>
+#include "CourseNode.h"
 
 namespace abcu
 {
-
-    class Course
-    {
-    public:
-        // Course Name and id
-        std::string name, courseId;
-        // Set of all the pre-requisites
-        // Set is used here to ensure O(1) access and deletion when removing invalid prerequisites
-        std::unordered_set<std::string> prerequisites;
-
-        /**
-         * @brief Parse a `std::string` to a course object.
-         * @param line The line to parse.
-         * @return The @ref Course object.
-         *
-         * @throws `std::invalid_argument` if the string parsing fail with invalid course name or course id.
-         */
-        static Course parseCourse(const std::string& line)
-        {
-            std::stringstream ss(line);
-            std::string currentToken;
-            int iteration = 0;
-            Course course;
-            while (std::getline(ss, currentToken, ','))
-            {
-                if (iteration == 0)
-                {
-                    // Course ID
-                    // If the course name is empty, then it is not a valid course
-                    if (currentToken.length() < 1)
-                        throw std::invalid_argument("[Invalid Course]: Empty Course ID");
-
-                    course.courseId = currentToken;
-                }
-                else if (iteration == 1)
-                {
-                    // Course name
-                    // If the course name is empty, then it is not a valid course
-                    if (currentToken.length() < 1)
-                        throw std::invalid_argument("[Invalid Course]: Empty Course Name");
-                    course.name = currentToken;
-                }
-                else
-                {
-                    // Prerequisites
-                    if (currentToken.length() > 1)
-                        course.prerequisites.insert(currentToken);
-                }
-                // Increment the iteration count to move forward
-                ++iteration;
-            }
-
-            return course;
-        }
-
-
-        /**
-         * @brief Stream @p course to the output stream for printing.
-         *
-         * @param stream The ostream to stream the object to.
-         * @param course The object to stream.
-         *
-         * @return A reference to @p stream that has the object.
-         */
-        friend std::ostream& operator<<(std::ostream& stream, const Course& course)
-        {
-            stream << course.name << " (" << course.courseId << ")\n";
-            stream << "Prerequisites: ";
-
-            // Print all the prerequisites in a comma separated form.
-            int prerequisiteCount = 0;
-            for (const auto& prerequisite : course.prerequisites)
-            {
-                stream << prerequisite;
-                // Only output the delimiter if the current prerequisite is not the last pre-requisite
-                if (++prerequisiteCount < course.prerequisites.size())
-                    stream << ", ";
-            }
-
-            // If there are no pre-requisites, let the user know
-            if (prerequisiteCount == 0)
-                stream << "None";
-
-            stream << "\n\n";
-            return stream;
-        }
-    };
-
-    class CourseNode
-    {
-    public:
-        Course course;
-
-        // Initialize left and right with nullptr
-        CourseNode* left{ nullptr };
-        CourseNode* right{ nullptr };
-    };
-
-    class CourseManager
+        class CourseManager
     {
         // Initialize root with nullptr
         CourseNode* root{ nullptr };

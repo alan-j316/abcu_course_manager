@@ -11,7 +11,13 @@
 
 #include "CourseManager.h"
 
+#include "Utils.h"
 
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <unordered_set>
 namespace abcu
 {
 
