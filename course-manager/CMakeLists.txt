@@ -2,11 +2,11 @@ add_executable(ABCUApplication)
 
 
 set(SourceDir "src/")
-set(CompilationUnits "CourseManager.cpp;Course.cpp;Main.cpp")
+set(CompilationUnits "CourseManager.cpp;Course.cpp;ABCUApplication.cpp;Main.cpp")
 list(TRANSFORM CompilationUnits PREPEND ${SourceDir})
 
 set(HeaderDir "include/")
-set(HeaderFiles "Utils.h;CourseManager.h;Course.h;CourseNode.h")
+set(HeaderFiles "Utils.h;CourseManager.h;Course.h;CourseNode.h;ABCUApplication.h")
 list(TRANSFORM HeaderFiles PREPEND ${HeaderDir})
 
 target_sources(

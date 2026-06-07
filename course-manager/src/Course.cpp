@@ -1,9 +1,9 @@
 /**
- * @file CourseManager.cpp
+ * @file Course.cpp
  * @author Alan Abraham P Kochumon
  * @date Created on: June 06, 2026
  *
- * @brief Implementation of member function defined in CourseManager.h
+ * @brief Implementation of member function defined in Course.h
  *
  * @copyright Copyright (c) 2026 Alan Abraham P Kochumon
  */
