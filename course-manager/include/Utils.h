@@ -10,8 +10,8 @@
  */
 
 
-#include <string>
 #include <cctype>
+#include <string>
 
 
 namespace abcu
@@ -28,18 +28,29 @@ namespace abcu
          *
          * @return 0 if both are equal, 1 if first string is greater else -1.
          */
-        static bool strCmp(const std::string& a, const std::string& b)
+        static int strCmp(const std::string& a, const std::string& b)
         {
             const auto charCount = std::min(a.length(), b.length());
 
             // Compare each character for equality
             // Return false on first character mismatch
             for (std::size_t i = 0; i < charCount; ++i)
-                if (std::tolower(a[i]) != std::tolower(b[i]))
-                    return  
+            {
+                // If the first character of the first string is lexicographically greater return 1
+                if (std::tolower(a[i]) > std::tolower(b[i]))
+                    return 1;
+                // Similarly, when the first character is less than subsequent character is string2, return -1
+                else if (std::tolower(a[i]) < std::tolower(b[i]))
+                    return -1;
+            }
 
-            // Return true
-            // return;
+            // Edge case: Either strings are substring of each other
+            // If so return 1 if first string is of greater length, else -1 and 0 if both are of same length
+            if (a.length() > b.length())
+                return 1;
+            else if (a.length() < b.length())
+                return -1;
+            return 0;
         }
 
     } // namespace utils

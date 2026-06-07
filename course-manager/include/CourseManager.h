@@ -172,7 +172,6 @@ namespace abcu
             std::cin.exceptions(std::ios_base::goodbit);
 
             //TODO: Validation [Removing invalid prerequisites]
-            //TODO: StrCmp
         }
 
 
@@ -189,14 +188,14 @@ namespace abcu
             {
                 // If the current course's id and passed-in course id are equal
                 // Then print the course information
-                if (utils::strCmp(current->course.courseId, courseId))
+                if (utils::strCmp(current->course.courseId, courseId) == 0)
                 {
                     std::cout << current->course;
                     return;
                 }
 
                 // Else if the search course id lower, search the left subtree
-                if (courseId < current->course.courseId)
+                if (utils::strCmp(courseId, current->course.courseId) < 0)
                     current = current->left;
                 // else search the right subtree
                 else
@@ -276,7 +275,7 @@ namespace abcu
         /**
          * @brief Print the course in alphabetical sorting.
          */
-        void printCourses()
+        void printCourses() const
         {
             // Edge case: There are no courses
             if (root == nullptr)
