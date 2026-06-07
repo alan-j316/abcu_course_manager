@@ -171,7 +171,7 @@ namespace abcu
             // Turn off exceptions
             std::cin.exceptions(std::ios_base::goodbit);
 
-            //TODO: Validation [Removing invalid prerequisites]
+            // TODO: Validation [Removing invalid prerequisites]
         }
 
 
@@ -208,8 +208,6 @@ namespace abcu
         }
 
         // TODO: remove invalid prerequisites
-        //  TODO: find course
-        //  TODO: Destructor
 
 
         /**
@@ -286,6 +284,28 @@ namespace abcu
 
             // Helper function that recursively prints the courses
             printInOrder(root);
+        }
+
+
+        /**
+         * @brief Delete the current course from memory, after freeing its children.
+         * @param node
+         */
+        void removeAllCourse(CourseNode* node)
+        {
+            // Base case
+            if (node == nullptr)
+                return;
+            // Recursively delete left and right subchildren
+            removeAllCourse(node->left);
+            removeAllCourse(node->right);
+            // Afterward delete the node
+            delete node;
+        }
+
+        ~CourseManager()
+        {
+            removeAllCourse(root);
         }
     };
 
