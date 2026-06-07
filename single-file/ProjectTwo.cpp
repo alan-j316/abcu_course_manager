@@ -1,5 +1,5 @@
 /**
- * @file CourseManager.cpp
+ * @file ProjectTwo.cpp
  * @author Alan Abraham P Kochumon
  * @date Created on: June 07, 2026
  *
@@ -316,6 +316,10 @@ namespace abcu
         {
             std::ifstream csvFile(filename);
 
+            if (!csvFile.is_open()) {
+                throw std::runtime_error("Error: Cannot find or open the file.");
+            }
+
             std::string line;
             while (std::getline(csvFile, line))
             {
@@ -449,9 +453,14 @@ namespace abcu
         removeInvalidPrerequisites(node->left, cache);
         removeInvalidPrerequisites(node->right, cache);
 
-        for (auto& prerequisite : node->course.prerequisites)
-            if (cache.count(prerequisite) == 0)
-                node->course.prerequisites.erase(prerequisite);
+        auto prerequisites = &node->course.prerequisites;
+        for (auto it = prerequisites->begin(); it != prerequisites->end(); ) {
+            if (cache.count(*it) == 0) {
+                it = node->course.prerequisites.erase(it); // erase returns the next valid iterator
+            } else {
+                ++it;
+            }
+        }
     }
 
 
