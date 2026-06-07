@@ -46,7 +46,7 @@ namespace abcu
          */
         friend std::ostream& operator<<(std::ostream& stream, const Course& course)
         {
-            stream << course.name << " (" << course.courseId << ")\n";
+            stream << course.courseId << " (" << course.name << ")\n";
             stream << "Prerequisites: ";
 
             // Print all the prerequisites in a comma separated form.

@@ -15,12 +15,12 @@
 int main(int argc, char* argv[])
 {
 
-    std::string filename = "ABCU_Advising_Program_Input2.csv";
+    std::string filename = "ABCU_Advising_Program_Input.csv";
+    // If a commandline argument is passed-in for filename
     if (argc > 1)
     {
+        // Then, that file is used
         filename = argv[1];
-        std::cout << "\nInput File: ";
-        std::cout << filename;
     }
 
     abcu::ABCUApplication app(filename);

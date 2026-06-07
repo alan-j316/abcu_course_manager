@@ -41,7 +41,7 @@ namespace abcu
 
     void CourseManager::loadCourses(const std::string& filename)
     {
-        std::cout << "Loading CSV file..." << '\n';
+        std::cout << "Loading CSV file...\n\n";
 
         // Cache to add the existing courses so we can filter out any non-existant courses from pre-requisites
         std::unordered_set<std::string> existingCourses;
@@ -170,6 +170,7 @@ namespace abcu
 
         // Helper function that recursively prints the courses
         printInOrder(root);
+        std::cout << '\n';
     }
 
 
@@ -204,7 +205,7 @@ namespace abcu
             return;
 
         printInOrder(node->left);
-        std::cout << node->course;
+        std::cout << node->course.courseId << " (" << node->course.name << ")\n";
         printInOrder(node->right);
     }
 
