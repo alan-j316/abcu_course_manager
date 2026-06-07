@@ -12,9 +12,9 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <string>
-#include <limits>
 #include <unordered_set>
 
 
@@ -162,7 +162,7 @@ namespace abcu
     class ABCUApplication
     {
     public:
-        explicit ABCUApplication(const std::string& filename);
+        explicit ABCUApplication(const std::string& filename = "");
 
         /**
          * @brief Run the application loop.
@@ -171,6 +171,11 @@ namespace abcu
          *       run in another application loop.
          */
         void run();
+
+        /**
+         * @brief Take the file name for parsing as input from user.
+         */
+        void getFileInput();
 
     private:
         bool _running;
@@ -316,7 +321,8 @@ namespace abcu
         {
             std::ifstream csvFile(filename);
 
-            if (!csvFile.is_open()) {
+            if (!csvFile.is_open())
+            {
                 throw std::runtime_error("Error: Cannot find or open the file.");
             }
 
@@ -454,10 +460,14 @@ namespace abcu
         removeInvalidPrerequisites(node->right, cache);
 
         auto prerequisites = &node->course.prerequisites;
-        for (auto it = prerequisites->begin(); it != prerequisites->end(); ) {
-            if (cache.count(*it) == 0) {
+        for (auto it = prerequisites->begin(); it != prerequisites->end();)
+        {
+            if (cache.count(*it) == 0)
+            {
                 it = node->course.prerequisites.erase(it); // erase returns the next valid iterator
-            } else {
+            }
+            else
+            {
                 ++it;
             }
         }
@@ -506,6 +516,15 @@ namespace abcu
         }
     }
 
+    void ABCUApplication::getFileInput()
+    {
+        std::cout << "Enter filename: \n";
+        std::cin >> _filename;
+
+        // Defaults to a filename if the user provided filename is empty
+        if (_filename.length() < 1)
+            _filename = "ABCU_Advising_Program_Input.csv";
+    }
 
     void ABCUApplication::printMenu()
     {
@@ -587,14 +606,15 @@ namespace abcu
 int main(int argc, char* argv[])
 {
 
-    std::string filename = "ABCU_Advising_Program_Input.csv";
-    // If a commandline argument is passed-in for filename
-    if (argc > 1)
-    {
-        // Then, that file is used
-        filename = argv[1];
-    }
+    // std::string filename = "ABCU_Advising_Program_Input.csv";
+    // // If a commandline argument is passed-in for filename
+    // if (argc > 1)
+    // {
+    //     // Then, that file is used
+    //     filename = argv[1];
+    // }
 
-    abcu::ABCUApplication app(filename);
+    abcu::ABCUApplication app{};
+    app.getFileInput();
     app.run();
 }

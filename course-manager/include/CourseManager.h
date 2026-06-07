@@ -11,13 +11,15 @@
  */
 
 
+#include "CourseNode.h"
+
 #include <string>
 #include <unordered_set>
-#include "CourseNode.h"
+#include <limits>
 
 namespace abcu
 {
-        class CourseManager
+    class CourseManager
     {
         // Initialize root with nullptr
         CourseNode* root{ nullptr };

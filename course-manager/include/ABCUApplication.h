@@ -20,7 +20,7 @@ namespace abcu
     class ABCUApplication
     {
     public:
-        explicit ABCUApplication(const std::string& filename);
+        explicit ABCUApplication(const std::string& filename = "");
 
         /**
          * @brief Run the application loop.
@@ -29,6 +29,12 @@ namespace abcu
          *       run in another application loop.
          */
         void run();
+
+
+        /**
+         * @brief Take the file name for parsing as input from user.
+         */
+        void getFileInput();
 
     private:
         bool _running;
@@ -52,6 +58,7 @@ namespace abcu
          * @throw `std::invalid_argument` if the @p actionCode is out of range.
          */
         void dispatchAction(int actionCode);
+
     };
 
 } // namespace abcu

@@ -50,6 +50,7 @@ namespace abcu
 
     void ABCUApplication::dispatchAction(const int actionCode)
     {
+        std::cout << '\n';
 
         std::string searchCourseId;
         switch (actionCode)
@@ -63,6 +64,7 @@ namespace abcu
             case 3:
                 std::cout << "What are you looking for?  ";
                 std::cin >> searchCourseId;
+                std::cout << '\n';
                 _manager.printCourse(searchCourseId);
                 break;
             case 9:
@@ -72,6 +74,17 @@ namespace abcu
             default:
                 throw std::invalid_argument("Invalid option! Please try again!");
         }
+    }
+
+
+    void ABCUApplication::getFileInput()
+    {
+        std::cout << "Enter filename: \n";
+        std::cin >> _filename;
+
+        // Defaults to a filename if the user provided filename is empty
+        if (_filename.length() < 1)
+            _filename = "ABCU_Advising_Program_Input.csv";
     }
 
 
