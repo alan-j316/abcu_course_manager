@@ -9,13 +9,15 @@
  */
 
 #include "ABCUApplication.h"
+
+#include <filesystem>
 #include <iostream>
 #include <utility>
 
 namespace abcu
 {
 
-    ABCUApplication::ABCUApplication(std::string  filename): _running(true), _filename(std::move(filename)) {}
+    ABCUApplication::ABCUApplication(std::string filename): _running(true), _filename(std::move(filename)) {}
 
     /**************************************
      *                                    *
@@ -78,14 +80,27 @@ namespace abcu
     }
 
 
-    void ABCUApplication::getFileInput()
+    bool ABCUApplication::getFileInput()
     {
         std::cout << "Enter filename: \n";
         std::cin >> _filename;
 
-        // Defaults to a filename if the user provided filename is empty
-        if (_filename.length() < 1)
+        // Validate if the file exists using a file system
+        if (std::filesystem::path path = _filename; !std::filesystem::exists(path))
+        {
+            std::cout << "'" << _filename << "' doesn't exist in path. Defaulting to default file.\n";
+            // Defaults to a filename if the user provided filename is not valid.
             _filename = "ABCU_Advising_Program_Input.csv";
+
+            // Check if the default file exist. If not exit the program.
+            path = _filename;
+            if (!std::filesystem::exists(path))
+            {
+                std::cout << "Default file doesn't exist in program path.\nUnrecoverable error. Exiting...";
+                return false;
+            }
+        }
+        return true;
     }
 
 

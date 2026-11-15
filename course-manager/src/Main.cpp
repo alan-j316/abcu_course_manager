@@ -26,6 +26,9 @@ int main(int argc, char* argv[])
     std::cout << "Welcome to the course planner.\n";
 
     abcu::ABCUApplication app{};
-    app.getFileInput();
+    if (!app.getFileInput())
+    {
+        return 0;
+    }
     app.run();
 }

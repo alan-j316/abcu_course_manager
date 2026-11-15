@@ -32,8 +32,10 @@ namespace abcu
 
         /**
          * @brief Take the file name for parsing as input from user.
+         * @return True if the file is valid.
+         * @return False otherwise.
          */
-        void getFileInput();
+        bool getFileInput();
 
     private:
         bool _running;
