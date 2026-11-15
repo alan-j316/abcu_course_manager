@@ -12,10 +12,10 @@
 
 
 
+#include "Course.h"
+
 #include <string>
 #include <unordered_map>
-
-#include "Course.h"
 
 
 namespace abcu
@@ -51,12 +51,17 @@ namespace abcu
         /**
          * @brief Remove invalid pre-requisites from the courses.
          *        A prerequisite is considered invalid, if that course id is not present in the course list.
-         *
          */
         void removeInvalidPrerequisites();
 
+        /// Indicate whether the courses are loaded and ready.
+        /// @return True if courses are loaded successfully.
+        /// @return False otherwise.
+        [[nodiscard]] bool coursesReady() const;
+
     protected:
         std::unordered_map<std::string, Course> _courses;
+        bool _loaded{ false };
     };
 
 } // namespace abcu

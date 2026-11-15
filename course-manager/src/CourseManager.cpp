@@ -67,14 +67,14 @@ namespace abcu
         // Turn off exceptions
         std::cin.exceptions(std::ios_base::goodbit);
         removeInvalidPrerequisites();
+        _loaded = true;
     }
 
 
 
     void CourseManager::printCourse(const std::string& courseId) const
     {
-        if (_courses.empty())
-            std::cout << "Empty course list. Consider loading the courses first.\n";
+        if (!coursesReady()) return;
 
         // If no courses found then print the result
         if (const auto courseIt = _courses.find(courseId); courseIt == _courses.cend())
@@ -92,6 +92,8 @@ namespace abcu
 
     void CourseManager::printCourses() const
     {
+        if (!coursesReady()) return;
+
         // Store the values into a temporary vector
         std::vector<std::pair<std::string, Course>> courseVec(_courses.begin(), _courses.end());
         std::sort(courseVec.begin(), courseVec.end(), [](const auto& a, const auto& b) {
@@ -129,5 +131,21 @@ namespace abcu
                     course.prerequisites.erase(prerequisite);
             }
         }
+    }
+
+    bool CourseManager::coursesReady() const
+    {
+        if (!_loaded)
+        {
+            std::cout << "Courses not loaded! Load the course using Option 1\n";
+            return false;
+        }
+
+        if (_courses.empty())
+        {
+            std::cout << "Empty course list. Consider loading the courses first.\n";
+            return false;
+        }
+        return true;
     }
 } // namespace abcu

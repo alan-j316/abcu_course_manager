@@ -96,7 +96,7 @@ namespace abcu
             path = _filename;
             if (!std::filesystem::exists(path))
             {
-                std::cout << "Default file doesn't exist in program path.\nUnrecoverable error. Exiting...";
+                std::cout << "Default file doesn't exist in program path.\nUnrecoverable error. Exiting...\n";
                 return false;
             }
         }
