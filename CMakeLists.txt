@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(CS300Assignments LANGUAGES CXX)
+project(ABCUCourseManager LANGUAGES CXX)
 enable_testing()
 
 add_library(StrictWarnings INTERFACE) # Used for linking Warning flags
