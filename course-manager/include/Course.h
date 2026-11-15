@@ -27,11 +27,11 @@ namespace abcu
         std::unordered_set<std::string> prerequisites;
 
         /**
-         * @brief Parse a `std::string` to a course object.
+         * @brief Parse a std::string to a course object.
          * @param line The line to parse.
          * @return The @ref Course object.
          *
-         * @throws `std::invalid_argument` if the string parsing fail with invalid course name or course id.
+         * @throws std::invalid_argument if the string parsing fail with invalid course name or course id.
          */
         static Course parseCourse(const std::string& line);
 

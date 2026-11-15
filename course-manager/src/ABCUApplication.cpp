@@ -9,12 +9,13 @@
  */
 
 #include "ABCUApplication.h"
-
+#include <iostream>
+#include <utility>
 
 namespace abcu
 {
 
-    ABCUApplication::ABCUApplication(const std::string& filename): _running(true), _filename(filename) {}
+    ABCUApplication::ABCUApplication(std::string  filename): _running(true), _filename(std::move(filename)) {}
 
     /**************************************
      *                                    *
@@ -94,6 +95,7 @@ namespace abcu
         try
         {
             // Set the iostream to trigger an exception
+            // NOLINTNEXTLINE
             std::cin.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
             int userInput;
@@ -101,7 +103,7 @@ namespace abcu
             // Call a subroutine that handles the appropriate action
             dispatchAction(userInput);
         }
-        catch (std::exception& e)
+        catch ([[maybe_unused]] std::exception& e)
         {
             // Print the error message
             std::cout << "Invalid option. Please try again!\n";

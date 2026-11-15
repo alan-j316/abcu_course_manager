@@ -44,10 +44,11 @@ namespace abcu
     {
         std::cout << "Loading CSV file...\n\n";
 
-        // Cache to add the existing courses so we can filter out any non-existant courses from pre-requisites
+        // Cache to add the existing courses so we can filter out any non-existent courses from pre-requisites
         std::unordered_set<std::string> existingCourses;
 
         // Set the iostream to trigger an exception
+        // NOLINTNEXTLINE
         std::cin.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
         try
@@ -175,7 +176,7 @@ namespace abcu
 
         // Helper function that recursively prints the courses
         printInOrder(root);
-        std::cout << std::endl;
+        std::cout << '\n';
     }
 
 
@@ -219,7 +220,7 @@ namespace abcu
         printInOrder(node->right);
     }
 
-    void CourseManager::removeAllCourse(CourseNode* node)
+    void CourseManager::removeAllCourse(const CourseNode* node)
     {
         // Base case
         if (node == nullptr)

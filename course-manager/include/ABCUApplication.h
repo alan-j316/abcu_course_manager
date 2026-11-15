@@ -12,7 +12,6 @@
 
 #include "CourseManager.h"
 
-#include <iostream>
 
 namespace abcu
 {
@@ -20,7 +19,7 @@ namespace abcu
     class ABCUApplication
     {
     public:
-        explicit ABCUApplication(const std::string& filename = "");
+        explicit ABCUApplication(std::string  filename = "");
 
         /**
          * @brief Run the application loop.
@@ -55,7 +54,7 @@ namespace abcu
          * @brief Dispatch an action based on the @p actionCode.
          * @param actionCode The code/identifier of the action to perform.
          *
-         * @throw `std::invalid_argument` if the @p actionCode is out of range.
+         * @throw std::invalid_argument if the @p actionCode is out of range.
          */
         void dispatchAction(int actionCode);
 

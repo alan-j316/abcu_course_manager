@@ -15,7 +15,6 @@
 
 #include <string>
 #include <unordered_set>
-#include <limits>
 
 namespace abcu
 {
@@ -46,7 +45,7 @@ namespace abcu
          * @brief Delete the current course from memory, after freeing its children.
          * @param node
          */
-        static void removeAllCourse(CourseNode* node);
+        static void removeAllCourse(const CourseNode* node);
 
     public:
         /**
