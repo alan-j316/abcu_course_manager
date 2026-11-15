@@ -1,5 +1,5 @@
 add_executable(ABCUApplication)
-
+target_compile_features(ABCUApplication PRIVATE cxx_std_17)
 
 set(SourceDir "src/")
 set(CompilationUnits "CourseManager.cpp;Course.cpp;ABCUApplication.cpp;Main.cpp")

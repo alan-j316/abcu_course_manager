@@ -14,15 +14,45 @@
 #include "CourseNode.h"
 
 #include <string>
+#include <unordered_map>
+#include <string>
 #include <unordered_set>
 
 namespace abcu
 {
     class CourseManager
     {
-        // Initialize root with nullptr
-        CourseNode* root{ nullptr };
+    public:
+        /**
+         * @brief Class destructor.
+         */
+        ~CourseManager();
 
+        /**
+         * @brief Load a CSV file containing courses into a container.
+         */
+        void loadCourses(const std::string& filename);
+
+        /**
+         * @brief Search for a course with an id of @p courseId, and print it's details.
+         * @param courseId The courseId to match.
+         */
+        void printCourse(std::string_view courseId) const;
+
+        /**
+         * @brief Insert @ref course into the course manager.
+         * @param course The course to insert.
+         */
+        void insertCourse(const Course& course);
+
+        /**
+         * @brief Print the courses in alphabetical sorting.
+         */
+        void printCourses() const;
+
+
+
+    private:
         /**
          * @brief Remove invalid pre-requisites from the courses.
          *        A prerequisite is considered invalid, if that course id is not present in @p cache.
@@ -47,33 +77,8 @@ namespace abcu
          */
         static void removeAllCourse(const CourseNode* node);
 
-    public:
-        /**
-         * @brief Class destructor.
-         */
-        ~CourseManager();
-
-        /**
-         * @brief Load a CSV file containing courses into a container.
-         */
-        void loadCourses(const std::string& filename);
-
-        /**
-         * @brief Search for a course with an id of @p courseId, and print it's details.
-         * @param courseId The courseId to match.
-         */
-        void printCourse(const std::string& courseId) const;
-
-        /**
-         * @brief Insert @ref course into the course manager.
-         * @param course The course to insert.
-         */
-        void insertCourse(const Course& course);
-
-        /**
-         * @brief Print the courses in alphabetical sorting.
-         */
-        void printCourses() const;
+    protected:
+        std::unordered_map<std::string, Course> _courses;
     };
 
 } // namespace abcu
