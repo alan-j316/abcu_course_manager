@@ -11,8 +11,6 @@
 
 #include "CourseManager.h"
 
-#include "Utils.h"
-
 #include <algorithm>
 #include <fstream>
 #include <iostream>

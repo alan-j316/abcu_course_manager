@@ -11,12 +11,11 @@
  */
 
 
-#include "CourseNode.h"
 
 #include <string>
 #include <unordered_map>
-#include <string>
-#include <unordered_set>
+
+#include "Course.h"
 
 
 namespace abcu
