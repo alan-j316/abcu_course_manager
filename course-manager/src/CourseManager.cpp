@@ -21,31 +21,15 @@
 
 namespace abcu
 {
-
-    /**************************************
-     *                                    *
-     *           INITIALIZATION           *
-     *                                    *
-     **************************************/
-
-    CourseManager::~CourseManager()
-    {
-        removeAllCourse(root);
-    }
-
-
     /**************************************
      *                                    *
      *           PUBLIC METHODS           *
      *                                    *
      **************************************/
 
-    void CourseManager::loadCourses(const std::string& filename)
+    void CourseManager::loadCourses(const std::string_view filename)
     {
         std::cout << "Loading CSV file...\n\n";
-
-        // Cache to add the existing courses so we can filter out any non-existent courses from pre-requisites
-        std::unordered_set<std::string> existingCourses;
 
         // Set the iostream to trigger an exception
         // NOLINTNEXTLINE
@@ -53,9 +37,10 @@ namespace abcu
 
         try
         {
-            std::ifstream csvFile(filename);
+            std::ifstream csvFile((filename.data()));
 
-            if (!csvFile.is_open()) {
+            if (!csvFile.is_open())
+            {
                 throw std::runtime_error("Error: Cannot find or open the file.");
             }
 
@@ -65,8 +50,6 @@ namespace abcu
                 try
                 {
                     auto course = Course::parseCourse(line);
-                    // Add the CourseId to the cache
-                    existingCourses.insert(course.courseId);
                     insertCourse(course);
                 }
                 catch (const std::exception& e)
@@ -85,99 +68,47 @@ namespace abcu
         }
         // Turn off exceptions
         std::cin.exceptions(std::ios_base::goodbit);
-
-        removeInvalidPrerequisites(root, existingCourses);
+        removeInvalidPrerequisites();
     }
 
 
 
     void CourseManager::printCourse(const std::string& courseId) const
     {
-        if (root == nullptr)
+        if (_courses.empty())
             std::cout << "Empty course list. Consider loading the courses first.\n";
 
-        auto current = root;
-        // Print the current course if it's ID matches the provided course id
-
-        while (current != nullptr)
-        {
-            // If the current course's id and passed-in course id are equal
-            // Then print the course information
-            if (utils::strCmp(current->course.courseId, courseId) == 0)
-            {
-                std::cout << current->course;
-                return;
-            }
-
-            // Else if the search course id lower, search the left subtree
-            if (utils::strCmp(courseId, current->course.courseId) < 0)
-                current = current->left;
-            // else search the right subtree
-            else
-                current = current->right;
-        }
-
-        // If the function doesn't early exit
-        // Then, there are no course with the given id
-        std::cout << "No course with " << courseId << " found!\n";
+        // If no courses found then print the result
+        if (const auto courseIt = _courses.find(courseId); courseIt == _courses.cend())
+            std::cout << "No course with " << courseId << " found!\n";
+        else
+            std::cout << courseIt->second;
     }
 
 
     void CourseManager::insertCourse(const Course& course)
     {
-        auto node = new CourseNode;
-        node->course = course;
-
-        if (root == nullptr)
-            root = node;
-        else
-        {
-            auto current = root;
-            while (true)
-            {
-                // If the course to insert has name with lower lexicographical index
-                // then move to the left branch
-                if (course.courseId < current->course.courseId)
-                {
-                    if (current->left == nullptr)
-                    {
-                        // Insert the node at left that slot is empty
-                        current->left = node;
-                        return; // Return to exit the loop since the node is inserted
-                    }
-                    // Move forward
-                    current = current->left;
-                }
-                // Else move to the right branch
-                else
-                {
-                    if (current->right == nullptr)
-                    {
-                        // Insert the node at left that slot is empty
-                        current->right = node;
-                        return; // Return to exit the loop since the node is inserted
-                    }
-                    // Move forward
-                    current = current->right;
-                }
-            }
-        }
+        _courses.insert_or_assign(course.courseId, course);
     }
 
 
     void CourseManager::printCourses() const
     {
-        // Edge case: There are no courses
-        if (root == nullptr)
-        {
-            std::cout << "No courses!";
-            return;
-        }
+        // Store the values into a temporary vector
+        std::vector<std::pair<std::string, Course>> courseVec(_courses.begin(), _courses.end());
+        std::sort(courseVec.begin(), courseVec.end(), [](const auto& a, const auto& b) {
+            // Ascending order
+            return a.first < b.first;
+        });
 
-        // Helper function that recursively prints the courses
-        printInOrder(root);
+        for (const auto& [key, course] : courseVec)
+        {
+            std::cout << course;
+        }
         std::cout << '\n';
     }
+
+
 
 
     /**************************************
@@ -186,50 +117,19 @@ namespace abcu
      *                                    *
      **************************************/
 
-    void CourseManager::removeInvalidPrerequisites(CourseNode* node, const std::unordered_set<std::string>& cache)
+    void CourseManager::removeInvalidPrerequisites()
     {
-        if (cache.size() < 1)
-            return; // No invalidation is performed if the cache is empty
-
-        // Base case
-        if (node == nullptr)
-            return; // Base case
-
-        // Remove invalid course pre-requisite from the subtrees
-        removeInvalidPrerequisites(node->left, cache);
-        removeInvalidPrerequisites(node->right, cache);
-
-        auto prerequisites = &node->course.prerequisites;
-        for (auto it = prerequisites->begin(); it != prerequisites->end(); ) {
-            if (cache.count(*it) == 0) {
-                it = node->course.prerequisites.erase(it); // erase returns the next valid iterator
-            } else {
-                ++it;
+        // Although the loop is O(N*M) it only happens on load.
+        // Where N is the number of courses and M is average number of prerequisites which can be utmost N.
+        for (auto& [courseId, course] : _courses)
+        {
+            for (const auto& prerequisite : course.prerequisites)
+            {
+                const auto curCourseIt = _courses.find(prerequisite);
+                // Remove the course requisite if it's not a valid one
+                if (curCourseIt == _courses.end())
+                    course.prerequisites.erase(prerequisite);
             }
         }
     }
-
-
-    void CourseManager::printInOrder(const CourseNode* node)
-    {
-        if (node == nullptr)
-            return;
-
-        printInOrder(node->left);
-        std::cout << node->course.courseId << " (" << node->course.name << ")\n";
-        printInOrder(node->right);
-    }
-
-    void CourseManager::removeAllCourse(const CourseNode* node)
-    {
-        // Base case
-        if (node == nullptr)
-            return;
-        // Recursively delete left and right subchildren
-        removeAllCourse(node->left);
-        removeAllCourse(node->right);
-        // Afterward delete the node
-        delete node;
-    }
-
 } // namespace abcu

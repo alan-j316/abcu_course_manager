@@ -13,7 +13,7 @@
 
 namespace abcu
 {
-        Course Course::parseCourse(const std::string& line)
+    Course Course::parseCourse(const std::string& line)
     {
         std::stringstream ss(line);
         std::string currentToken;
@@ -50,4 +50,4 @@ namespace abcu
 
         return course;
     }
-}
+} // namespace abcu

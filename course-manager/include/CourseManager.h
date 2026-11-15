@@ -18,26 +18,22 @@
 #include <string>
 #include <unordered_set>
 
+
 namespace abcu
 {
     class CourseManager
     {
     public:
         /**
-         * @brief Class destructor.
-         */
-        ~CourseManager();
-
-        /**
          * @brief Load a CSV file containing courses into a container.
          */
-        void loadCourses(const std::string& filename);
+        void loadCourses(std::string_view filename);
 
         /**
          * @brief Search for a course with an id of @p courseId, and print it's details.
          * @param courseId The courseId to match.
          */
-        void printCourse(std::string_view courseId) const;
+        void printCourse(const std::string& courseId) const;
 
         /**
          * @brief Insert @ref course into the course manager.
@@ -55,27 +51,10 @@ namespace abcu
     private:
         /**
          * @brief Remove invalid pre-requisites from the courses.
-         *        A prerequisite is considered invalid, if that course id is not present in @p cache.
+         *        A prerequisite is considered invalid, if that course id is not present in the course list.
          *
-         * @note To speed up look, the method uses the supplied cache for valid course look,
-         *       so providing an empty cache will return the courses without validation.
-         *
-         * @param node  The root of the course manager.
-         * @param cache The cache to use for validation.
          */
-        static void removeInvalidPrerequisites(CourseNode* node, const std::unordered_set<std::string>& cache);
-
-        /**
-         * @brief Traverse and print the courses in an in-order format.
-         * @param node The current root.
-         */
-        static void printInOrder(const CourseNode* node);
-
-        /**
-         * @brief Delete the current course from memory, after freeing its children.
-         * @param node
-         */
-        static void removeAllCourse(const CourseNode* node);
+        void removeInvalidPrerequisites();
 
     protected:
         std::unordered_map<std::string, Course> _courses;
